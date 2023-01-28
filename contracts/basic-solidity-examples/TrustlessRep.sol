@@ -1,7 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.17;
 
-contract TrustlessRep {
+import "@openzeppelin/contracts/access/Ownable.sol";
+
+contract TrustlessRep is Ownable {
     struct Credential {
         address issuer;
         string name;
@@ -23,7 +25,7 @@ contract TrustlessRep {
         string memory name,
         string memory rating,
         string memory issueDate
-    ) public {
+    ) public onlyOwner {
         require(authorized[holder][msg.sender]);
         credentials[name] = Credential(msg.sender, name, rating, issueDate);
         emit IdentityAttestation(
