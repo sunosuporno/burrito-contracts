@@ -6,13 +6,14 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 contract TrustlessRep is Ownable {
     struct Credential {
         address issuer;
+        address minerAddress;
         string name;
         string rating;
+        uint stakeAmount;
         string issueDate;
     }
 
     mapping(string => Credential) public credentials;
-    mapping(address => mapping(address => bool)) public authorized;
 
     event IdentityAttestation(
         address indexed subject,
@@ -22,17 +23,32 @@ contract TrustlessRep is Ownable {
 
     function issueCredential(
         address holder,
+        address minerAddress,
         string memory name,
         string memory rating,
         string memory issueDate
     ) public onlyOwner {
-        require(authorized[holder][msg.sender]);
-        credentials[name] = Credential(msg.sender, name, rating, issueDate);
+        credentials[name] = Credential({
+            issuer: msg.sender,
+            minerAddress: minerAddress,
+            name: name,
+            rating: rating,
+            stakeAmount: 0,
+            issueDate: issueDate
+        });
+        // credentials = Credential(msg.sender, name, rating, 0, issueDate);
+        // credentials = Credential(msg.sender, name, rating, 0, issueDate);
         emit IdentityAttestation(
             holder,
             msg.sender,
             keccak256(abi.encodePacked(name, rating, issueDate))
         );
+    }
+
+    function stake(string memory name) public payable {
+        require(msg.value > 0, "Stake value must be greater than 0");
+        Credential memory miner = credentials[name];
+        miner.stakeAmount += msg.value;
     }
 
     function getCredential(
