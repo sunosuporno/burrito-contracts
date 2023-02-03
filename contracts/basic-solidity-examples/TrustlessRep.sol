@@ -22,7 +22,6 @@ contract TrustlessRep is Ownable {
     );
 
     function issueCredential(
-        address holder,
         address minerAddress,
         string memory name,
         string memory rating,
@@ -39,9 +38,19 @@ contract TrustlessRep is Ownable {
         // credentials = Credential(msg.sender, name, rating, 0, issueDate);
         // credentials = Credential(msg.sender, name, rating, 0, issueDate);
         emit IdentityAttestation(
-            holder,
+            minerAddress,
             msg.sender,
             keccak256(abi.encodePacked(name, rating, issueDate))
+        );
+    }
+
+    function updateCredential(string memory name, string memory rating) public onlyOwner {
+        credentials[name].rating = rating;
+
+        emit IdentityAttestation(
+            credentials[name].minerAddress,
+            msg.sender,
+            keccak256(abi.encodePacked(name, rating, credentials[name].issueDate))
         );
     }
 
