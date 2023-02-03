@@ -56,8 +56,7 @@ contract TrustlessRep is Ownable {
 
     function stake(string memory name) public payable {
         require(msg.value > 0, "Stake value must be greater than 0");
-        Credential memory miner = credentials[name];
-        miner.stakeAmount += msg.value;
+        credentials[name].stakeAmount += msg.value;
     }
 
     function getCredential(
