@@ -20,6 +20,7 @@ contract TrustlessRep is Ownable {
         address indexed issuer,
         bytes32 indexed data
     );
+    event stakeAddition(string name, uint256 indexed stakeAmount);
 
     function issueCredential(
         address minerAddress,
@@ -57,6 +58,11 @@ contract TrustlessRep is Ownable {
     function stake(string memory name) public payable {
         require(msg.value > 0, "Stake value must be greater than 0");
         credentials[name].stakeAmount += msg.value;
+        emit stakeAddition(name, msg.value);
+    }
+
+    function changeMinerAddress(string memory name, address newMinerAddress) public onlyOwner {
+        credentials[name].minerAddress = newMinerAddress;
     }
 
     function getCredential(
